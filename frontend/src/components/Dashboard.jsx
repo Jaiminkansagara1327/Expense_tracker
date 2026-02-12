@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Wallet,
     TrendingUp,
@@ -19,7 +20,8 @@ import {
     Bell,
     Settings,
     User,
-    Search
+    Search,
+    LogOut
 } from 'lucide-react';
 import {
     LineChart,
@@ -66,7 +68,8 @@ const recentTransactions = [
     { id: 6, title: 'Freelance Project', category: 'Income', amount: 12000, date: '2026-01-23', type: 'income', icon: CreditCard },
 ];
 
-function Dashboard() {
+function Dashboard({ user, onLogout }) {
+    const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [selectedPeriod, setSelectedPeriod] = useState('month');
 
@@ -74,6 +77,23 @@ function Dashboard() {
     const totalExpenses = 46000;
     const balance = totalIncome - totalExpenses;
     const savingsRate = ((balance / totalIncome) * 100).toFixed(1);
+
+    const handleLogout = async () => {
+        try {
+            await fetch('http://localhost:5001/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include',
+            });
+        } catch (err) {
+            console.error('Logout error:', err);
+        }
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        onLogout();
+        navigate('/login');
+    };
+
+    const firstName = user?.name?.split(' ')[0] || 'User';
 
     return (
         <div className="dashboard">
@@ -120,10 +140,14 @@ function Dashboard() {
                             <User size={20} />
                         </div>
                         <div className="user-info">
-                            <div className="user-name">Jaimin Kansagara</div>
-                            <div className="user-email">jaimin@example.com</div>
+                            <div className="user-name">{user?.name || 'User'}</div>
+                            <div className="user-email">{user?.email || ''}</div>
                         </div>
                     </div>
+                    <button className="btn btn-secondary logout-btn" onClick={handleLogout}>
+                        <LogOut size={16} />
+                        Logout
+                    </button>
                 </div>
             </aside>
 
@@ -137,7 +161,7 @@ function Dashboard() {
                         </button>
                         <div className="header-title">
                             <h1>Dashboard</h1>
-                            <p className="header-subtitle">Welcome back, Jaimin! 👋</p>
+                            <p className="header-subtitle">Welcome back, {firstName}! 👋</p>
                         </div>
                     </div>
 
