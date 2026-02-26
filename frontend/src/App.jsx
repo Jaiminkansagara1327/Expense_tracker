@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
+import Transactions from './components/Transactions';
 import './App.css';
 
 function App() {
@@ -47,6 +48,10 @@ function App() {
           <Route
             path="/dashboard"
             element={user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/transactions"
+            element={user ? <Transactions user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}
           />
           <Route
             path="*"

@@ -5,6 +5,7 @@ require("dotenv").config();
 
 const pool = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
+const transactionRoutes = require("./routes/transactionRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -29,7 +30,20 @@ const initDB = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+        await pool.query(`
+      CREATE TABLE IF NOT EXISTS transactions (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        title VARCHAR(255) NOT NULL,
+        amount NUMERIC(10, 2) NOT NULL,
+        type VARCHAR(50) NOT NULL,
+        category VARCHAR(100) NOT NULL,
+        date DATE NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
         console.log("✅ Users table ready");
+        console.log("✅ Transactions table ready");
     } catch (err) {
         console.error("❌ Error creating table:", err.message);
     }
@@ -41,6 +55,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/transactions", transactionRoutes);
 
 // Start server
 app.listen(PORT, () => {

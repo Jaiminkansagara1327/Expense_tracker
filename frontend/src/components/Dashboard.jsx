@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
     Wallet,
     TrendingUp,
@@ -112,14 +112,14 @@ function Dashboard({ user, onLogout }) {
                 </div>
 
                 <nav className="sidebar-nav">
-                    <a href="#" className="nav-item active">
+                    <Link to="/dashboard" className="nav-item active">
                         <TrendingUp size={20} />
                         <span>Dashboard</span>
-                    </a>
-                    <a href="#" className="nav-item">
+                    </Link>
+                    <Link to="/transactions" className="nav-item">
                         <Wallet size={20} />
                         <span>Transactions</span>
-                    </a>
+                    </Link>
                     <a href="#" className="nav-item">
                         <PiggyBank size={20} />
                         <span>Budgets</span>
@@ -127,10 +127,6 @@ function Dashboard({ user, onLogout }) {
                     <a href="#" className="nav-item">
                         <GrowthIcon size={20} />
                         <span>Analytics</span>
-                    </a>
-                    <a href="#" className="nav-item">
-                        <CreditCard size={20} />
-                        <span>Cards</span>
                     </a>
                 </nav>
 

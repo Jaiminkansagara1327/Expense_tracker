@@ -1,0 +1,158 @@
+.transactions-container {
+  padding: 0;
+  margin-top: var(--space-xl);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.transactions-table-wrapper {
+  overflow-x: auto;
+}
+
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactions-table th,
+.transactions-table td {
+  padding: var(--space-lg);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.transactions-table th {
+  background: var(--color-bg-tertiary);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.5px;
+}
+
+.transactions-table tbody tr {
+  transition: background-color var(--transition-base);
+}
+
+.transactions-table tbody tr:hover {
+  background: var(--color-bg-tertiary);
+}
+
+.category-badge {
+  background: hsla(268, 70%, 55%, 0.1);
+  color: var(--color-primary);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.type-badge {
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.type-badge.income {
+  background: hsla(142, 71%, 45%, 0.1);
+  color: var(--color-success);
+}
+
+.type-badge.expense {
+  background: hsla(0, 72%, 51%, 0.1);
+  color: var(--color-danger);
+}
+
+.actions-cell {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.action-btn.edit {
+  color: var(--color-text-secondary);
+}
+
+.action-btn.edit:hover {
+  background: var(--color-bg-primary);
+  color: var(--color-primary);
+}
+
+.action-btn.delete {
+  color: var(--color-danger);
+}
+
+.action-btn.delete:hover {
+  background: var(--color-danger-bg);
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: var(--color-bg-primary);
+  padding: var(--space-2xl);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 440px;
+  box-shadow: var(--shadow-xl);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content .form-input {
+  padding: 12px 14px;
+  /* Override padding since we don't have icons here */
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+}
+
+.modal-header h2 {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+}
+
+.empty-state {
+  padding: var(--space-3xl);
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.loading-state {
+  padding: var(--space-xl);
+  text-align: center;
+}
