@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
     Wallet,
@@ -21,7 +21,8 @@ import {
     Settings,
     User,
     Search,
-    LogOut
+    LogOut,
+    AlertCircle
 } from 'lucide-react';
 import {
     LineChart,
@@ -75,6 +76,7 @@ function Dashboard({ user, onLogout }) {
     const [budgets, setBudgets] = useState([]);
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [dismissedAlerts, setDismissedAlerts] = useState([]);
 
     const fetchData = async () => {
         try {
@@ -114,6 +116,7 @@ function Dashboard({ user, onLogout }) {
     };
 
     const alerts = budgets.filter(b => calculateSpent(b.category) > b.amount);
+    const visibleAlerts = alerts.filter(a => !dismissedAlerts.includes(a.id));
 
     const totalIncome = transactions
         .filter(t => t.type === 'income')
@@ -223,30 +226,42 @@ function Dashboard({ user, onLogout }) {
                 </header>
 
                 {/* Budget Alerts */}
-                {alerts.length > 0 && (
+                {visibleAlerts.length > 0 && (
                     <div className="budget-alerts animate-fadeIn" style={{ marginBottom: '24px' }}>
-                        {alerts.map(alert => (
+                        {visibleAlerts.map(alert => (
                             <div key={alert.id} className="alert card-glass" style={{
                                 padding: '16px',
-                                borderLeft: '4px solid #f43f5e',
+                                borderLeft: '4px solid var(--color-danger)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '16px',
-                                background: 'rgba(244, 63, 94, 0.1)',
-                                marginBottom: '12px'
+                                background: 'var(--color-danger-bg)',
+                                marginBottom: '12px',
+                                borderRadius: 'var(--radius-lg)'
                             }}>
-                                <div style={{ color: '#f43f5e' }}>
+                                <div style={{ color: 'var(--color-danger)' }}>
                                     <AlertCircle size={24} />
                                 </div>
-                                <div>
-                                    <h4 style={{ fontWeight: 'bold', color: '#fff' }}>Budget Exceeded: {alert.category}</h4>
-                                    <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>
+                                <div style={{ flex: 1 }}>
+                                    <h4 style={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
+                                        Budget Exceeded: {alert.category}
+                                    </h4>
+                                    <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>
                                         You've spent ₹{calculateSpent(alert.category).toLocaleString()} which is over your ₹{Number(alert.amount).toLocaleString()} limit.
                                     </p>
                                 </div>
-                                <Link to="/budgets" className="btn btn-secondary" style={{ marginLeft: 'auto', fontSize: '13px' }}>
-                                    Adjust Budget
-                                </Link>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <Link to="/budgets" className="btn btn-secondary" style={{ fontSize: '13px', padding: '6px 12px' }}>
+                                        Adjust
+                                    </Link>
+                                    <button
+                                        className="btn btn-icon"
+                                        onClick={() => setDismissedAlerts([...dismissedAlerts, alert.id])}
+                                        style={{ width: '32px', height: '32px', color: 'var(--color-text-tertiary)' }}
+                                    >
+                                        <X size={18} />
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
