@@ -72,11 +72,57 @@ function Dashboard({ user, onLogout }) {
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [selectedPeriod, setSelectedPeriod] = useState('month');
+    const [budgets, setBudgets] = useState([]);
+    const [transactions, setTransactions] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const totalIncome = 87000;
-    const totalExpenses = 46000;
+    const fetchData = async () => {
+        try {
+            const [budgetRes, transRes] = await Promise.all([
+                fetch('http://localhost:5001/api/budgets', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    credentials: 'include'
+                }),
+                fetch('http://localhost:5001/api/transactions', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    credentials: 'include'
+                })
+            ]);
+
+            const bData = await budgetRes.json();
+            const tData = await transRes.json();
+
+            if (budgetRes.ok) setBudgets(bData);
+            if (transRes.ok) setTransactions(tData);
+        } catch (err) {
+            console.error('Error fetching dashboard data:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const calculateSpent = (category) => {
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        return transactions
+            .filter(t => t.category === category && t.type === 'expense' && new Date(t.date) >= startOfMonth)
+            .reduce((sum, t) => sum + Number(t.amount), 0);
+    };
+
+    const alerts = budgets.filter(b => calculateSpent(b.category) > b.amount);
+
+    const totalIncome = transactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + Number(t.amount), 0);
+    const totalExpenses = transactions
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + Number(t.amount), 0);
     const balance = totalIncome - totalExpenses;
-    const savingsRate = ((balance / totalIncome) * 100).toFixed(1);
+    const savingsRate = totalIncome > 0 ? ((balance / totalIncome) * 100).toFixed(1) : 0;
 
     const handleLogout = async () => {
         try {
@@ -116,14 +162,14 @@ function Dashboard({ user, onLogout }) {
                         <TrendingUp size={20} />
                         <span>Dashboard</span>
                     </Link>
+                    <Link to="/budgets" className="nav-item">
+                        <PiggyBank size={20} />
+                        <span>Budgets</span>
+                    </Link>
                     <Link to="/transactions" className="nav-item">
                         <Wallet size={20} />
                         <span>Transactions</span>
                     </Link>
-                    <a href="#" className="nav-item">
-                        <PiggyBank size={20} />
-                        <span>Budgets</span>
-                    </a>
                     <a href="#" className="nav-item">
                         <GrowthIcon size={20} />
                         <span>Analytics</span>
@@ -175,6 +221,36 @@ function Dashboard({ user, onLogout }) {
                         </button>
                     </div>
                 </header>
+
+                {/* Budget Alerts */}
+                {alerts.length > 0 && (
+                    <div className="budget-alerts animate-fadeIn" style={{ marginBottom: '24px' }}>
+                        {alerts.map(alert => (
+                            <div key={alert.id} className="alert card-glass" style={{
+                                padding: '16px',
+                                borderLeft: '4px solid #f43f5e',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '16px',
+                                background: 'rgba(244, 63, 94, 0.1)',
+                                marginBottom: '12px'
+                            }}>
+                                <div style={{ color: '#f43f5e' }}>
+                                    <AlertCircle size={24} />
+                                </div>
+                                <div>
+                                    <h4 style={{ fontWeight: 'bold', color: '#fff' }}>Budget Exceeded: {alert.category}</h4>
+                                    <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>
+                                        You've spent ₹{calculateSpent(alert.category).toLocaleString()} which is over your ₹{Number(alert.amount).toLocaleString()} limit.
+                                    </p>
+                                </div>
+                                <Link to="/budgets" className="btn btn-secondary" style={{ marginLeft: 'auto', fontSize: '13px' }}>
+                                    Adjust Budget
+                                </Link>
+                            </div>
+                        ))}
+                    </div>
+                )}
 
                 {/* Stats Grid */}
                 <div className="stats-grid">
@@ -301,8 +377,11 @@ function Dashboard({ user, onLogout }) {
                                             backgroundColor: 'rgba(30, 30, 40, 0.95)',
                                             border: '1px solid rgba(255,255,255,0.1)',
                                             borderRadius: '8px',
-                                            boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
+                                            boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+                                            color: '#fff'
                                         }}
+                                        itemStyle={{ color: '#fff' }}
+                                        labelStyle={{ color: '#fff' }}
                                     />
                                     <Legend />
                                     <Line
@@ -357,8 +436,11 @@ function Dashboard({ user, onLogout }) {
                                             backgroundColor: 'rgba(30, 30, 40, 0.95)',
                                             border: '1px solid rgba(255,255,255,0.1)',
                                             borderRadius: '8px',
-                                            boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
+                                            boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+                                            color: '#fff'
                                         }}
+                                        itemStyle={{ color: '#fff' }}
+                                        labelStyle={{ color: '#fff' }}
                                     />
                                 </PieChart>
                             </ResponsiveContainer>

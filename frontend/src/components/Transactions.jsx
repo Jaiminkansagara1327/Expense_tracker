@@ -25,6 +25,7 @@ function Transactions({ user, onLogout }) {
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [transactions, setTransactions] = useState([]);
+    const [budgets, setBudgets] = useState([]);
     const [loading, setLoading] = useState(true);
 
     // Modal states
@@ -41,23 +42,32 @@ function Transactions({ user, onLogout }) {
 
     const categories = ['Food', 'Transport', 'Rent', 'Entertainment', 'Shopping', 'Utilities', 'Salary', 'Freelance'];
 
-    const fetchTransactions = async () => {
+    const fetchData = async () => {
         try {
-            const res = await fetch('http://localhost:5001/api/transactions', {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                credentials: 'include'
-            });
-            const data = await res.json();
-            if (res.ok) setTransactions(data);
+            const [transRes, budgetRes] = await Promise.all([
+                fetch('http://localhost:5001/api/transactions', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    credentials: 'include'
+                }),
+                fetch('http://localhost:5001/api/budgets', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    credentials: 'include'
+                })
+            ]);
+            const tData = await transRes.json();
+            const bData = await budgetRes.json();
+
+            if (transRes.ok) setTransactions(tData);
+            if (budgetRes.ok) setBudgets(bData);
         } catch (err) {
-            console.error('Error fetching transactions:', err);
+            console.error('Error fetching data:', err);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchTransactions();
+        fetchData();
     }, []);
 
     const handleLogout = async () => {
@@ -112,8 +122,23 @@ function Transactions({ user, onLogout }) {
                 body: JSON.stringify(formData)
             });
             if (res.ok) {
+                // Check if budget is crossed
+                const categoryBudget = budgets.find(b => b.category === formData.category);
+                if (categoryBudget && formData.type === 'expense') {
+                    const now = new Date();
+                    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                    const spentSoFar = transactions
+                        .filter(t => t.category === formData.category && t.type === 'expense' && new Date(t.date) >= startOfMonth)
+                        .reduce((sum, t) => sum + Number(t.amount), 0);
+
+                    const newTotal = spentSoFar + Number(formData.amount);
+                    if (newTotal > categoryBudget.amount) {
+                        alert(`⚠️ Budget Alert: You have exceeded your ₹${categoryBudget.amount} budget for ${formData.category}!`);
+                    }
+                }
+
                 setModalOpen(false);
-                fetchTransactions();
+                fetchData();
             } else {
                 const errorData = await res.json();
                 setModalError(errorData.message || 'Failed to save transaction');
@@ -158,12 +183,12 @@ function Transactions({ user, onLogout }) {
                     <Link to="/dashboard" className="nav-item">
                         <TrendingUp size={20} /><span>Dashboard</span>
                     </Link>
+                    <Link to="/budgets" className="nav-item">
+                        <PiggyBank size={20} /><span>Budgets</span>
+                    </Link>
                     <Link to="/transactions" className="nav-item active">
                         <Wallet size={20} /><span>Transactions</span>
                     </Link>
-                    <a href="#" className="nav-item">
-                        <PiggyBank size={20} /><span>Budgets</span>
-                    </a>
                     <a href="#" className="nav-item">
                         <GrowthIcon size={20} /><span>Analytics</span>
                     </a>

@@ -4,6 +4,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
 import Transactions from './components/Transactions';
+import Budgets from './components/Budgets';
 import './App.css';
 
 function App() {
@@ -48,6 +49,10 @@ function App() {
           <Route
             path="/dashboard"
             element={user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/budgets"
+            element={user ? <Budgets user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}
           />
           <Route
             path="/transactions"
