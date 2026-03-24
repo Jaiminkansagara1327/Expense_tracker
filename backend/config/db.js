@@ -7,9 +7,9 @@ const pool = new Pool({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     database: process.env.DB_NAME,
-    ssl: {
-        rejectUnauthorized: false
-    }
+    // Many local Postgres instances don't support SSL. Only enable SSL when explicitly requested.
+    // Set DB_SSL=true in your env (for managed DBs that require SSL).
+    ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false
 });
 
 // Test connection

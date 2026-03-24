@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Wallet, Mail, Lock, Eye, EyeOff, AlertCircle, LogIn } from 'lucide-react';
 import './Auth.css';
 
 function Login({ onLogin }) {
     const navigate = useNavigate();
+    const location = useLocation();
+    // Read optional ?redirect=/join/TOKEN param so invite link works after login
+    const redirectTo = new URLSearchParams(location.search).get('redirect') || '/dashboard';
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
@@ -21,7 +24,7 @@ function Login({ onLogin }) {
         setLoading(true);
 
         try {
-            const res = await fetch('http://localhost:5001/api/auth/login', {
+            const res = await fetch('http://localhost:5000/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -37,7 +40,7 @@ function Login({ onLogin }) {
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
             onLogin(data.user);
-            navigate('/dashboard');
+            navigate(redirectTo);
         } catch (err) {
             setError(err.message);
         } finally {

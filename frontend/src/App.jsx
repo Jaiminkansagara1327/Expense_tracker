@@ -5,6 +5,8 @@ import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
 import Transactions from './components/Transactions';
 import Budgets from './components/Budgets';
+import Splitwise from './components/Splitwise';
+import JoinGroup from './components/JoinGroup';
 import './App.css';
 
 function App() {
@@ -57,6 +59,15 @@ function App() {
           <Route
             path="/transactions"
             element={user ? <Transactions user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/splitwise"
+            element={user ? <Splitwise user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}
+          />
+          {/* Invite join page - accessible logged in or not */}
+          <Route
+            path="/join/:token"
+            element={<JoinGroup user={user} />}
           />
           <Route
             path="*"

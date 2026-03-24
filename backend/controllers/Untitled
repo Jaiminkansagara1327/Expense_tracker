@@ -1,0 +1,3 @@
+exports.createGroup = async (req, res) => {
+  res.json({ message: "Create group working" });
+};
