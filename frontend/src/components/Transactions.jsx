@@ -45,11 +45,11 @@ function Transactions({ user, onLogout }) {
     const fetchData = async () => {
         try {
             const [transRes, budgetRes] = await Promise.all([
-                fetch('http://localhost:5000/api/transactions', {
+                fetch('http://localhost:5001/api/transactions', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     credentials: 'include'
                 }),
-                fetch('http://localhost:5000/api/budgets', {
+                fetch('http://localhost:5001/api/budgets', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     credentials: 'include'
                 })
@@ -72,7 +72,7 @@ function Transactions({ user, onLogout }) {
 
     const handleLogout = async () => {
         try {
-            await fetch('http://localhost:5000/api/auth/logout', { method: 'POST', credentials: 'include' });
+            await fetch('http://localhost:5001/api/auth/logout', { method: 'POST', credentials: 'include' });
         } catch (err) { }
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -107,8 +107,8 @@ function Transactions({ user, onLogout }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const url = editingId
-            ? `http://localhost:5000/api/transactions/${editingId}`
-            : 'http://localhost:5000/api/transactions';
+            ? `http://localhost:5001/api/transactions/${editingId}`
+            : 'http://localhost:5001/api/transactions';
         const method = editingId ? 'PUT' : 'POST';
 
         try {
@@ -153,7 +153,7 @@ function Transactions({ user, onLogout }) {
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure?")) return;
         try {
-            const res = await fetch(`http://localhost:5000/api/transactions/${id}`, {
+            const res = await fetch(`http://localhost:5001/api/transactions/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 credentials: 'include'

@@ -123,11 +123,24 @@ const initDB = async () => {
       ALTER TABLE split_expenses
       ADD COLUMN IF NOT EXISTS title VARCHAR(255)
     `);
-    await pool.query(`
-      UPDATE split_expenses
-      SET title = COALESCE(title, description, 'Expense')
-      WHERE title IS NULL
+    // Safely migrate old data if exists
+    const hasDescription = await pool.query(`
+      SELECT column_name FROM information_schema.columns 
+      WHERE table_name='split_expenses' AND column_name='description'
     `);
+    if (hasDescription.rowCount > 0) {
+      await pool.query(`
+        UPDATE split_expenses
+        SET title = COALESCE(title, description, 'Expense')
+        WHERE title IS NULL
+      `);
+    } else {
+      await pool.query(`
+        UPDATE split_expenses
+        SET title = COALESCE(title, 'Expense')
+        WHERE title IS NULL
+      `);
+    }
     await pool.query(`
       ALTER TABLE split_expenses
       ADD COLUMN IF NOT EXISTS split_type VARCHAR(20) DEFAULT 'equal'

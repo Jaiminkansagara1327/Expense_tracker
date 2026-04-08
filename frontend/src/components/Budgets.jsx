@@ -39,11 +39,11 @@ function Budgets({ user, onLogout }) {
     const fetchData = async () => {
         try {
             const [budgetRes, transRes] = await Promise.all([
-                fetch('http://localhost:5000/api/budgets', {
+                fetch('http://localhost:5001/api/budgets', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     credentials: 'include'
                 }),
-                fetch('http://localhost:5000/api/transactions', {
+                fetch('http://localhost:5001/api/transactions', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     credentials: 'include'
                 })
@@ -67,7 +67,7 @@ function Budgets({ user, onLogout }) {
 
     const handleLogout = async () => {
         try {
-            await fetch('http://localhost:5000/api/auth/logout', { method: 'POST', credentials: 'include' });
+            await fetch('http://localhost:5001/api/auth/logout', { method: 'POST', credentials: 'include' });
         } catch (err) { }
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -78,7 +78,7 @@ function Budgets({ user, onLogout }) {
     const handleUpsert = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:5000/api/budgets', {
+            const res = await fetch('http://localhost:5001/api/budgets', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ function Budgets({ user, onLogout }) {
     const handleDelete = async (id) => {
         if (!window.confirm("Remove this budget?")) return;
         try {
-            const res = await fetch(`http://localhost:5000/api/budgets/${id}`, {
+            const res = await fetch(`http://localhost:5001/api/budgets/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 credentials: 'include'

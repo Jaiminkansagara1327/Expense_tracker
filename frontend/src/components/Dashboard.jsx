@@ -81,11 +81,11 @@ function Dashboard({ user, onLogout }) {
     const fetchData = async () => {
         try {
             const [budgetRes, transRes] = await Promise.all([
-                fetch('http://localhost:5000/api/budgets', {
+                fetch('http://localhost:5001/api/budgets', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     credentials: 'include'
                 }),
-                fetch('http://localhost:5000/api/transactions', {
+                fetch('http://localhost:5001/api/transactions', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     credentials: 'include'
                 })
@@ -129,7 +129,7 @@ function Dashboard({ user, onLogout }) {
 
     const handleLogout = async () => {
         try {
-            await fetch('http://localhost:5000/api/auth/logout', {
+            await fetch('http://localhost:5001/api/auth/logout', {
                 method: 'POST',
                 credentials: 'include',
             });
