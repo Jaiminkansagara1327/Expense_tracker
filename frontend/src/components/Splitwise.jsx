@@ -13,6 +13,7 @@ import {
   ReceiptIndianRupee,
   TrendingUp as GrowthIcon,
 } from "lucide-react";
+import { API_URL } from "../config/api";
 import "./Dashboard.css";
 
 function Splitwise({ user, onLogout }) {
@@ -75,8 +76,8 @@ function Splitwise({ user, onLogout }) {
     setError("");
     try {
       const [allUsers, myGroups] = await Promise.all([
-        callApi("http://localhost:5001/api/split/users"),
-        callApi("http://localhost:5001/api/split/groups"),
+        callApi(`${API_URL}/split/users`),
+        callApi(`${API_URL}/split/groups`),
       ]);
 
       setUsers(allUsers);
@@ -99,8 +100,8 @@ function Splitwise({ user, onLogout }) {
     }
     try {
       const [expenseData, balanceData] = await Promise.all([
-        callApi(`http://localhost:5001/api/split/groups/${groupId}/expenses`),
-        callApi(`http://localhost:5001/api/split/groups/${groupId}/balances`),
+        callApi(`${API_URL}/split/groups/${groupId}/expenses`),
+        callApi(`${API_URL}/split/groups/${groupId}/balances`),
       ]);
       setExpenses(expenseData);
       setBalances(balanceData);
@@ -121,7 +122,7 @@ function Splitwise({ user, onLogout }) {
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:5001/api/auth/logout", {
+      await fetch(`${API_URL}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -145,7 +146,7 @@ function Splitwise({ user, onLogout }) {
     try {
       // Only the creator's ID is sent; typed member names are display-only
       // (they are not registered users, so no IDs are available)
-      await callApi("http://localhost:5001/api/split/groups", {
+      await callApi(`${API_URL}/split/groups`, {
         method: "POST",
         body: JSON.stringify({ name: groupName, memberIds: [] }),
       });
@@ -176,7 +177,7 @@ function Splitwise({ user, onLogout }) {
     }));
 
     try {
-      await callApi(`http://localhost:5001/api/split/groups/${selectedGroupId}/expenses`, {
+      await callApi(`${API_URL}/split/groups/${selectedGroupId}/expenses`, {
         method: "POST",
         body: JSON.stringify({
           title: expenseTitle,
@@ -212,7 +213,7 @@ function Splitwise({ user, onLogout }) {
       return;
     }
     try {
-      await callApi(`http://localhost:5001/api/split/groups/${selectedGroupId}/members`, {
+      await callApi(`${API_URL}/split/groups/${selectedGroupId}/members`, {
         method: "POST",
         body: JSON.stringify({ userId: Number(memberToAdd) }),
       });
@@ -226,7 +227,7 @@ function Splitwise({ user, onLogout }) {
 
   const handleSettle = async (settlement) => {
     try {
-      await callApi("http://localhost:5001/api/split/settlements", {
+      await callApi(`${API_URL}/split/settlements`, {
         method: "POST",
         body: JSON.stringify({
           groupId: selectedGroupId,
@@ -244,7 +245,7 @@ function Splitwise({ user, onLogout }) {
   const handleRemoveMember = async (userId) => {
     if (!window.confirm("Are you sure you want to remove this member from the group?")) return;
     try {
-      await callApi(`http://localhost:5001/api/split/groups/${selectedGroupId}/members/${userId}`, {
+      await callApi(`${API_URL}/split/groups/${selectedGroupId}/members/${userId}`, {
         method: "DELETE",
       });
       await fetchBaseData();
@@ -257,7 +258,7 @@ function Splitwise({ user, onLogout }) {
   const handleDeleteGroup = async (groupId) => {
     if (!window.confirm("Are you sure you want to delete this group? All expenses and settlements will be permanently removed.")) return;
     try {
-      await callApi(`http://localhost:5001/api/split/groups/${groupId}`, {
+      await callApi(`${API_URL}/split/groups/${groupId}`, {
         method: "DELETE",
       });
       if (String(selectedGroupId) === String(groupId)) {
@@ -274,7 +275,7 @@ function Splitwise({ user, onLogout }) {
   const handleDeleteExpense = async (expenseId) => {
     if (!window.confirm("Are you sure you want to delete this expense?")) return;
     try {
-      await callApi(`http://localhost:5001/api/split/groups/${selectedGroupId}/expenses/${expenseId}`, {
+      await callApi(`${API_URL}/split/groups/${selectedGroupId}/expenses/${expenseId}`, {
         method: "DELETE",
       });
       await fetchGroupData(selectedGroupId);
@@ -540,7 +541,7 @@ function Splitwise({ user, onLogout }) {
                         if (!memberToAdd) return;
                         setError("");
                         try {
-                          await callApi(`http://localhost:5001/api/split/groups/${selectedGroupId}/members`, {
+                          await callApi(`${API_URL}/split/groups/${selectedGroupId}/members`, {
                             method: "POST",
                             body: JSON.stringify({ userId: Number(memberToAdd) }),
                           });
@@ -567,7 +568,7 @@ function Splitwise({ user, onLogout }) {
                         style={{ width: "100%", marginBottom: "8px" }}
                         onClick={async () => {
                           try {
-                            const data = await callApi(`http://localhost:5001/api/split/groups/${selectedGroupId}/invite`, { method: "POST" });
+                            const data = await callApi(`${API_URL}/split/groups/${selectedGroupId}/invite`, { method: "POST" });
                             setInviteLink(data.link);
                           } catch (err) {
                             setError(err.message);

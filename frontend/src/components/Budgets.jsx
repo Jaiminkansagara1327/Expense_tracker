@@ -18,6 +18,7 @@ import {
     Settings,
     TrendingUp as GrowthIcon
 } from 'lucide-react';
+import { API_URL } from '../config/api';
 import './Dashboard.css';
 
 function Budgets({ user, onLogout }) {
@@ -39,11 +40,11 @@ function Budgets({ user, onLogout }) {
     const fetchData = async () => {
         try {
             const [budgetRes, transRes] = await Promise.all([
-                fetch('http://localhost:5001/api/budgets', {
+                fetch(`${API_URL}/budgets`, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     credentials: 'include'
                 }),
-                fetch('http://localhost:5001/api/transactions', {
+                fetch(`${API_URL}/transactions`, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     credentials: 'include'
                 })
@@ -67,7 +68,7 @@ function Budgets({ user, onLogout }) {
 
     const handleLogout = async () => {
         try {
-            await fetch('http://localhost:5001/api/auth/logout', { method: 'POST', credentials: 'include' });
+            await fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
         } catch (err) { }
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -78,7 +79,7 @@ function Budgets({ user, onLogout }) {
     const handleUpsert = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:5001/api/budgets', {
+            const res = await fetch(`${API_URL}/budgets`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -102,7 +103,7 @@ function Budgets({ user, onLogout }) {
     const handleDelete = async (id) => {
         if (!window.confirm("Remove this budget?")) return;
         try {
-            const res = await fetch(`http://localhost:5001/api/budgets/${id}`, {
+            const res = await fetch(`${API_URL}/budgets/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 credentials: 'include'

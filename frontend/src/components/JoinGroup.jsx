@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Users, LogIn, CheckCircle, AlertCircle, Loader } from "lucide-react";
+import { API_URL } from "../config/api";
 import "./Dashboard.css";
 
 function JoinGroup({ user, onLogin }) {
@@ -15,7 +16,7 @@ function JoinGroup({ user, onLogin }) {
   useEffect(() => {
     const fetchInfo = async () => {
       try {
-        const res = await fetch(`http://localhost:5001/api/split/invite/${token}`);
+        const res = await fetch(`${API_URL}/split/invite/${token}`);
         const data = await res.json();
         if (!res.ok) {
           setStatus("invalid");
@@ -42,7 +43,7 @@ function JoinGroup({ user, onLogin }) {
     setStatus("joining");
     const authToken = localStorage.getItem("token");
     try {
-      const res = await fetch(`http://localhost:5001/api/split/invite/${token}/join`, {
+      const res = await fetch(`${API_URL}/split/invite/${token}/join`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -24,6 +24,7 @@ import {
     LogOut,
     AlertCircle
 } from 'lucide-react';
+import { API_URL } from '../config/api';
 import {
     LineChart,
     Line,
@@ -81,11 +82,11 @@ function Dashboard({ user, onLogout }) {
     const fetchData = async () => {
         try {
             const [budgetRes, transRes] = await Promise.all([
-                fetch('http://localhost:5001/api/budgets', {
+                fetch(`${API_URL}/budgets`, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     credentials: 'include'
                 }),
-                fetch('http://localhost:5001/api/transactions', {
+                fetch(`${API_URL}/transactions`, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     credentials: 'include'
                 })
@@ -129,7 +130,7 @@ function Dashboard({ user, onLogout }) {
 
     const handleLogout = async () => {
         try {
-            await fetch('http://localhost:5001/api/auth/logout', {
+            await fetch(`${API_URL}/auth/logout`, {
                 method: 'POST',
                 credentials: 'include',
             });

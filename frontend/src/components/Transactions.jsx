@@ -18,6 +18,7 @@ import {
     TrendingUp as GrowthIcon,
     CreditCard
 } from 'lucide-react';
+import { API_URL } from '../config/api';
 import './Dashboard.css'; // Inherits base layout styling
 import './Transactions.css';
 
@@ -45,11 +46,11 @@ function Transactions({ user, onLogout }) {
     const fetchData = async () => {
         try {
             const [transRes, budgetRes] = await Promise.all([
-                fetch('http://localhost:5001/api/transactions', {
+                fetch(`${API_URL}/transactions`, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     credentials: 'include'
                 }),
-                fetch('http://localhost:5001/api/budgets', {
+                fetch(`${API_URL}/budgets`, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     credentials: 'include'
                 })
@@ -72,7 +73,7 @@ function Transactions({ user, onLogout }) {
 
     const handleLogout = async () => {
         try {
-            await fetch('http://localhost:5001/api/auth/logout', { method: 'POST', credentials: 'include' });
+            await fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
         } catch (err) { }
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -107,8 +108,8 @@ function Transactions({ user, onLogout }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const url = editingId
-            ? `http://localhost:5001/api/transactions/${editingId}`
-            : 'http://localhost:5001/api/transactions';
+            ? `${API_URL}/transactions/${editingId}`
+            : `${API_URL}/transactions`;
         const method = editingId ? 'PUT' : 'POST';
 
         try {
@@ -153,7 +154,7 @@ function Transactions({ user, onLogout }) {
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure?")) return;
         try {
-            const res = await fetch(`http://localhost:5001/api/transactions/${id}`, {
+            const res = await fetch(`${API_URL}/transactions/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 credentials: 'include'

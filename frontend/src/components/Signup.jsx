@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Wallet, Mail, Lock, Eye, EyeOff, AlertCircle, UserPlus, User, CheckCircle } from 'lucide-react';
+import { API_URL } from '../config/api';
 import './Auth.css';
 
 function Signup() {
@@ -34,7 +35,7 @@ function Signup() {
         setLoading(true);
 
         try {
-            const res = await fetch('http://localhost:5001/api/auth/signup', {
+            const res = await fetch(`${API_URL}/auth/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
