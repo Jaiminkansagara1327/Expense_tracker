@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
     Wallet,
@@ -42,33 +42,22 @@ import {
 } from 'recharts';
 import './Dashboard.css';
 
-// Sample data for demonstration - Indian Context
-const expenseData = [
-    { month: 'Jan', income: 65000, expenses: 42000 },
-    { month: 'Feb', income: 68000, expenses: 45000 },
-    { month: 'Mar', income: 65000, expenses: 38000 },
-    { month: 'Apr', income: 72000, expenses: 48000 },
-    { month: 'May', income: 70000, expenses: 44000 },
-    { month: 'Jun', income: 75000, expenses: 46000 },
-];
-
-const categoryData = [
-    { name: 'Groceries & Food', value: 12500, color: '#a855f7' },
-    { name: 'Shopping', value: 8500, color: '#22c55e' },
-    { name: 'Auto/Metro', value: 3200, color: '#f43f5e' },
-    { name: 'Rent', value: 15000, color: '#3b82f6' },
-    { name: 'Entertainment', value: 4500, color: '#f59e0b' },
-    { name: 'Bills & Utilities', value: 2300, color: '#06b6d4' },
-];
-
-const recentTransactions = [
-    { id: 1, title: 'D-Mart Groceries', category: 'Groceries & Food', amount: -2450, date: '2026-01-27', type: 'expense', icon: ShoppingBag },
-    { id: 2, title: 'Salary Credited', category: 'Income', amount: 75000, date: '2026-01-25', type: 'income', icon: Wallet },
-    { id: 3, title: 'Café Coffee Day', category: 'Groceries & Food', amount: -320, date: '2026-01-26', type: 'expense', icon: Coffee },
-    { id: 4, title: 'House Rent', category: 'Rent', amount: -15000, date: '2026-01-24', type: 'expense', icon: Home },
-    { id: 5, title: 'Ola Auto', category: 'Auto/Metro', amount: -85, date: '2026-01-27', type: 'expense', icon: Car },
-    { id: 6, title: 'Freelance Project', category: 'Income', amount: 12000, date: '2026-01-23', type: 'income', icon: CreditCard },
-];
+// Dynamic data will be generated based on API transactions array.
+const getCategoryIcon = (category) => {
+    switch((category || "").toLowerCase()) {
+        case 'groceries & food': 
+        case 'groceries': return ShoppingBag;
+        case 'shopping': return ShoppingBag;
+        case 'auto/metro': 
+        case 'transport': return Car;
+        case 'rent': return Home;
+        case 'entertainment': return Coffee;
+        case 'bills & utilities': 
+        case 'bills': return Calendar;
+        case 'income': return Wallet;
+        default: return CreditCard;
+    }
+};
 
 function Dashboard({ user, onLogout }) {
     const navigate = useNavigate();
@@ -107,6 +96,60 @@ function Dashboard({ user, onLogout }) {
     useEffect(() => {
         fetchData();
     }, []);
+
+    const expenseData = useMemo(() => {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const map = new Map();
+        
+        transactions.forEach(t => {
+            if (!t.date) return;
+            const date = new Date(t.date);
+            const key = `${months[date.getMonth()]} ${date.getFullYear()}`;
+            if (!map.has(key)) map.set(key, { month: key, income: 0, expenses: 0, timestamp: date.getTime(), year: date.getFullYear(), monthNum: date.getMonth() });
+            
+            const curr = map.get(key);
+            if (t.type === 'income') curr.income += Number(Math.abs(t.amount));
+            else curr.expenses += Number(Math.abs(t.amount));
+        });
+
+        // Ensure we show at least something if no transactions exist
+        if (map.size === 0) {
+           const d = new Date();
+           return [{ month: `${months[d.getMonth()]} ${d.getFullYear()}`, income: 0, expenses: 0 }];
+        }
+
+        const sorted = Array.from(map.values()).sort((a,b) => {
+            if (a.year !== b.year) return a.year - b.year;
+            return a.monthNum - b.monthNum;
+        });
+        return sorted.slice(-6);
+    }, [transactions]);
+
+    const categoryData = useMemo(() => {
+        const catMap = new Map();
+        transactions.filter(t => t.type === 'expense').forEach(t => {
+            const cat = t.category || 'Other';
+            if (!catMap.has(cat)) catMap.set(cat, 0);
+            catMap.set(cat, catMap.get(cat) + Number(Math.abs(t.amount)));
+        });
+        
+        const colors = ['#a855f7', '#22c55e', '#3b82f6', '#f59e0b', '#06b6d4', '#eab308', '#f43f5e', '#8b5cf6'];
+        const sorted = Array.from(catMap.entries()).map(([name, value], i) => ({
+            name,
+            value,
+            color: colors[i % colors.length]
+        })).sort((a,b) => b.value - a.value);
+
+        return sorted.length > 0 ? sorted.slice(0, 6) : [{ name: 'No Expenses', value: 1, color: '#475569' }];
+    }, [transactions]);
+
+    const recentTransactions = useMemo(() => {
+        return transactions.slice().sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6).map(t => ({
+            ...t,
+            title: t.title || t.description || 'Transaction',
+            icon: getCategoryIcon(t.category)
+        }));
+    }, [transactions]);
 
     const calculateSpent = (category) => {
         const now = new Date();
@@ -480,7 +523,7 @@ function Dashboard({ user, onLogout }) {
                             <h3 className="section-title">Recent Transactions</h3>
                             <p className="section-subtitle">Your latest activity</p>
                         </div>
-                        <button className="btn btn-primary">
+                        <button className="btn btn-primary" onClick={() => navigate('/transactions', { state: { openModal: true } })}>
                             <Plus size={18} />
                             Add Transaction
                         </button>

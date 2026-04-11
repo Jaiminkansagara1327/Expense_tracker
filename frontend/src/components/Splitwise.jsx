@@ -12,6 +12,11 @@ import {
   Users,
   ReceiptIndianRupee,
   TrendingUp as GrowthIcon,
+  Settings,
+  Trash2,
+  History,
+  Link as LinkIcon,
+  AlertCircle
 } from "lucide-react";
 import { API_URL } from "../config/api";
 import "./Dashboard.css";
@@ -331,116 +336,53 @@ function Splitwise({ user, onLogout }) {
           </div>
         </header>
 
-        {error ? (
-          <div style={{ marginBottom: "16px", color: "#f43f5e", background: "#ffebee", padding: "12px", borderRadius: "8px" }}>
-            {error}
+        {error && (
+          <div className="card" style={{ marginBottom: "var(--space-lg)", color: "var(--color-danger)", background: "var(--color-danger-bg)", borderColor: "var(--color-danger-light)", display: "flex", gap: "var(--space-md)", alignItems: "center", padding: "var(--space-md)" }}>
+            <AlertCircle size={20} />
+            <span>{error}</span>
           </div>
-        ) : null}
+        )}
 
         {loading ? (
-          <div>Loading splitwise data...</div>
+          <div style={{ display: "flex", justifyContent: "center", padding: "var(--space-3xl)" }}>
+            <div className="animate-pulse" style={{ color: "var(--color-primary)" }}>Loading splitwise data...</div>
+          </div>
         ) : (
-          <>
-            <div className="charts-grid" style={{ marginBottom: "20px" }}>
-              {/* ── Create Group ─────────────────────────────── */}
-              <div className="chart-card card-glass" style={{ padding: "18px" }}>
-                <h3 style={{ marginBottom: "12px", display: "flex", gap: "8px", alignItems: "center" }}>
-                  <Users size={18} /> Create Group
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-xl)" }}>
+            {/* 1. TOP ROW: GROUP MANAGEMENT */}
+            <div className="stats-grid">
+              {/* Create Group */}
+              <div className="card-glass">
+                <h3 className="section-title" style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "var(--space-md)" }}>
+                  <div className="stat-icon stat-icon-primary" style={{ width: "32px", height: "32px", borderRadius: "var(--radius-sm)" }}>
+                    <Users size={16} />
+                  </div>
+                  Create Group
                 </h3>
 
-                <form onSubmit={handleCreateGroup}>
-                  <input
-                    className="form-input"
-                    placeholder="Group name"
-                    value={groupName}
-                    onChange={(e) => setGroupName(e.target.value)}
-                    style={{ marginBottom: "12px" }}
-                  />
-
-                  {/* Type member names manually */}
-                  <label style={{ display: "block", marginBottom: "4px", fontSize: "13px", opacity: 0.7 }}>
-                    Add Members
-                  </label>
-                  <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
-                    <input
-                      className="form-input"
-                      placeholder="Type friend's name…"
-                      value={newMemberNameInput}
-                      onChange={(e) => setNewMemberNameInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          const name = newMemberNameInput.trim();
-                          if (name && !groupMemberNames.includes(name)) {
-                            setGroupMemberNames((prev) => [...prev, name]);
-                            setNewMemberNameInput("");
-                          }
-                        }
-                      }}
-                      style={{ flex: 1 }}
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      style={{ whiteSpace: "nowrap", padding: "6px 14px" }}
-                      onClick={() => {
-                        const name = newMemberNameInput.trim();
-                        if (name && !groupMemberNames.includes(name)) {
-                          setGroupMemberNames((prev) => [...prev, name]);
-                          setNewMemberNameInput("");
-                        }
-                      }}
-                    >
-                      <Plus size={14} /> Add
-                    </button>
+                <form onSubmit={handleCreateGroup} style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}>
+                  <div className="input-group">
+                    <input className="input" placeholder="Group name" value={groupName} onChange={(e) => setGroupName(e.target.value)} />
                   </div>
 
-                  {/* Live member preview list */}
-                  {groupMemberNames.length > 0 && (
-                    <div style={{ marginBottom: "12px" }}>
-                      <div style={{ fontSize: "13px", opacity: 0.7, marginBottom: "6px" }}>Members added:</div>
-                      <div style={{ maxHeight: "130px", overflow: "auto" }}>
-                        {groupMemberNames.map((name) => (
-                          <div
-                            key={name}
-                            style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 8px", marginBottom: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "6px" }}
-                          >
-                            <span style={{ fontSize: "14px" }}>{name}</span>
-                            <button
-                              type="button"
-                              className="btn btn-icon"
-                              style={{ padding: "2px 4px", color: "#f43f5e", minWidth: "unset" }}
-                              title="Remove"
-                              onClick={() => setGroupMemberNames((prev) => prev.filter((n) => n !== name))}
-                            >
-                              <X size={13} />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <button type="submit" className="btn btn-primary" style={{ width: "100%" }}>
+                  <button type="submit" className="btn btn-primary" style={{ width: "100%", marginTop: "var(--space-sm)" }}>
                     <Plus size={16} /> Create Group
                   </button>
                 </form>
               </div>
 
-              {/* ── Manage Group ──────────────────────────────── */}
-              <div className="chart-card card-glass" style={{ padding: "18px" }}>
-                <h3 style={{ marginBottom: "12px", display: "flex", gap: "8px", alignItems: "center" }}>
-                  <Users size={18} /> Manage Group
+              {/* Manage Group */}
+              <div className="card-glass">
+                <h3 className="section-title" style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "var(--space-md)" }}>
+                  <div className="stat-icon stat-icon-warning" style={{ width: "32px", height: "32px", borderRadius: "var(--radius-sm)" }}>
+                    <Settings size={16} />
+                  </div>
+                  Manage Group
                 </h3>
 
-                {/* Group selector */}
-                <div style={{ marginBottom: "12px" }}>
-                  <label style={{ display: "block", marginBottom: "4px", fontSize: "13px", opacity: 0.7 }}>Select Group</label>
-                  <select
-                    className="form-input"
-                    value={selectedGroupId}
-                    onChange={(e) => setSelectedGroupId(e.target.value)}
-                  >
+                <div className="input-group" style={{ marginBottom: "var(--space-lg)" }}>
+                  <label className="input-label">Select Group</label>
+                  <select className="input" value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)}>
                     <option value="">-- Select a group --</option>
                     {groups.map((g) => (
                       <option key={g.id} value={g.id}>{g.name}</option>
@@ -449,344 +391,286 @@ function Splitwise({ user, onLogout }) {
                 </div>
 
                 {activeGroup ? (
-                  <>
-                    {/* Header with delete */}
-                    <div style={{ marginBottom: "10px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ fontWeight: 600, fontSize: "14px" }}>
-                        Members of <em>{activeGroup.name}</em>
-                      </span>
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        style={{ padding: "4px 10px", fontSize: "12px", background: "rgba(244,63,94,0.12)", color: "#f43f5e", borderColor: "rgba(244,63,94,0.25)" }}
-                        onClick={() => handleDeleteGroup(activeGroup.id)}
-                      >
-                        Delete Group
+                  <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontWeight: 600, fontSize: "var(--font-size-sm)" }}>Members of <em>{activeGroup.name}</em></span>
+                      <button type="button" className="btn btn-secondary" style={{ padding: "4px 8px", fontSize: "12px", color: "var(--color-danger)", borderColor: "var(--color-danger-bg)" }} onClick={() => handleDeleteGroup(activeGroup.id)}>
+                        <Trash2 size={12} style={{ marginRight: "4px" }} /> Delete Group
                       </button>
                     </div>
 
-                    {/* Current member list with remove buttons */}
-                    <div style={{ maxHeight: "130px", overflow: "auto", marginBottom: "12px" }}>
-                      {users
-                        .filter((u) => activeGroup.member_ids?.includes(u.id))
-                        .map((u) => (
-                          <div key={u.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px", padding: "4px 8px", background: "rgba(255,255,255,0.05)", borderRadius: "6px" }}>
-                            <span style={{ fontSize: "14px" }}>{u.name}</span>
-                            {u.id !== user.id && (
-                              <button
-                                className="btn btn-icon"
-                                style={{ padding: "2px 4px", color: "#f43f5e", minWidth: "unset" }}
-                                title="Remove member"
-                                onClick={() => handleRemoveMember(u.id)}
-                              >
-                                <X size={13} />
-                              </button>
-                            )}
-                          </div>
-                        ))}
+                    <div style={{ maxHeight: "150px", overflowY: "auto", border: "1px solid var(--color-border)", borderRadius: "var(--radius-md)", background: "var(--color-bg-tertiary)" }}>
+                      {users.filter((u) => activeGroup.member_ids?.includes(u.id)).map((u) => (
+                        <div key={u.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "var(--space-sm) var(--space-md)", borderBottom: "1px solid var(--color-border)" }}>
+                          <span style={{ fontSize: "var(--font-size-sm)", fontWeight: 500 }}>{u.name}</span>
+                          {u.id !== user.id ? (
+                            <button className="btn btn-icon" style={{ padding: "4px", color: "var(--color-danger)", width: "auto", height: "auto" }} onClick={() => handleRemoveMember(u.id)}>
+                              <X size={14} />
+                            </button>
+                          ) : (
+                            <span style={{ fontSize: "12px", color: "var(--color-text-tertiary)" }}>You</span>
+                          )}
+                        </div>
+                      ))}
                     </div>
 
-                    {/* ── Add Member ─────────────────────────────────── */}
-                    <label style={{ display: "block", marginBottom: "4px", fontSize: "13px", opacity: 0.7 }}>
-                      Add Registered Member
-                    </label>
-
-                    {/* Search box that filters real registered users */}
-                    <div style={{ marginBottom: "8px", position: "relative" }}>
-                      <input
-                        className="form-input"
-                        placeholder="Search by name or email…"
-                        value={memberSearchQuery}
-                        onChange={(e) => { setMemberSearchQuery(e.target.value); setMemberToAdd(""); }}
-                        style={{ width: "100%" }}
-                      />
-                      {!memberToAdd && memberSearchQuery.trim().length > 0 && (
-                        <div style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 10, background: "#1e293b", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", maxHeight: "160px", overflow: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}>
-                          {users
-                            .filter((u) =>
-                              !activeGroup.member_ids?.includes(u.id) &&
-                              (u.name.toLowerCase().includes(memberSearchQuery.toLowerCase()) ||
-                                u.email.toLowerCase().includes(memberSearchQuery.toLowerCase()))
-                            )
-                            .map((u) => (
+                    <div className="input-group" style={{ marginTop: "var(--space-sm)" }}>
+                      <label className="input-label">Add Registered Member</label>
+                      <div style={{ position: "relative" }}>
+                        <input
+                          className="input"
+                          placeholder="Search by name or email…"
+                          value={memberSearchQuery}
+                          onChange={(e) => { setMemberSearchQuery(e.target.value); setMemberToAdd(""); }}
+                        />
+                        {!memberToAdd && memberSearchQuery.trim().length > 0 && (
+                          <div style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 10, background: "var(--color-bg-secondary)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-md)", maxHeight: "160px", overflowY: "auto", boxShadow: "var(--shadow-lg)" }}>
+                            {users.filter((u) => !activeGroup.member_ids?.includes(u.id) && (u.name.toLowerCase().includes(memberSearchQuery.toLowerCase()) || u.email.toLowerCase().includes(memberSearchQuery.toLowerCase()))).map((u) => (
                               <div
                                 key={u.id}
-                                style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.06)", background: memberToAdd === String(u.id) ? "rgba(99,102,241,0.2)" : "transparent" }}
+                                style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid var(--color-border)", background: memberToAdd === String(u.id) ? "var(--color-primary-bg)" : "transparent" }}
                                 onClick={() => { setMemberToAdd(String(u.id)); setMemberSearchQuery(u.name); }}
                               >
-                                <div style={{ fontWeight: 500, fontSize: "14px" }}>{u.name}</div>
-                                <div style={{ fontSize: "12px", opacity: 0.6 }}>{u.email}</div>
+                                <div style={{ fontWeight: 500, fontSize: "14px", color: "var(--color-text-primary)" }}>{u.name}</div>
+                                <div style={{ fontSize: "12px", color: "var(--color-text-secondary)" }}>{u.email}</div>
                               </div>
                             ))}
-                          {users.filter((u) =>
-                            !activeGroup.member_ids?.includes(u.id) &&
-                            (u.name.toLowerCase().includes(memberSearchQuery.toLowerCase()) ||
-                              u.email.toLowerCase().includes(memberSearchQuery.toLowerCase()))
-                          ).length === 0 && (
-                              <div style={{ padding: "10px 12px", opacity: 0.6, fontSize: "13px" }}>
-                                No registered user found.{" "}
-                                <span style={{ color: "#a78bfa" }}>Use invite link below →</span>
-                              </div>
+                            {users.filter((u) => !activeGroup.member_ids?.includes(u.id) && (u.name.toLowerCase().includes(memberSearchQuery.toLowerCase()) || u.email.toLowerCase().includes(memberSearchQuery.toLowerCase()))).length === 0 && (
+                              <div style={{ padding: "10px 12px", fontSize: "13px", color: "var(--color-text-tertiary)" }}>No registered user found. Use invite link.</div>
                             )}
-                        </div>
-                      )}
+                          </div>
+                        )}
+                      </div>
+                      <button type="button" className="btn btn-primary" style={{ width: "100%", marginTop: "var(--space-sm)" }} disabled={!memberToAdd} onClick={handleAddMember}>
+                        <Plus size={14} /> Add Member
+                      </button>
                     </div>
 
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      style={{ width: "100%", marginBottom: "16px" }}
-                      disabled={!memberToAdd}
-                      onClick={async () => {
-                        if (!memberToAdd) return;
-                        setError("");
+                    <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: "var(--space-sm)" }}>
+                      <label className="input-label" style={{ marginBottom: "var(--space-sm)", display: "block" }}>Invite Link</label>
+                      <button type="button" className="btn btn-secondary" style={{ width: "100%", marginBottom: "var(--space-sm)" }} onClick={async () => {
                         try {
-                          await callApi(`${API_URL}/split/groups/${selectedGroupId}/members`, {
-                            method: "POST",
-                            body: JSON.stringify({ userId: Number(memberToAdd) }),
-                          });
-                          setMemberToAdd("");
-                          setMemberSearchQuery("");
-                          await fetchBaseData();
-                          await fetchGroupData(selectedGroupId);
-                        } catch (err) {
-                          setError(err.message);
-                        }
-                      }}
-                    >
-                      <Plus size={14} /> Add Member
-                    </button>
-
-                    {/* ── Invite Link ────────────────────────────────── */}
-                    <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "14px" }}>
-                      <label style={{ display: "block", marginBottom: "8px", fontSize: "13px", opacity: 0.7 }}>
-                        Or share an invite link
-                      </label>
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        style={{ width: "100%", marginBottom: "8px" }}
-                        onClick={async () => {
-                          try {
-                            const data = await callApi(`${API_URL}/split/groups/${selectedGroupId}/invite`, { method: "POST" });
-                            setInviteLink(data.link);
-                          } catch (err) {
-                            setError(err.message);
-                          }
-                        }}
-                      >
-                        🔗 Generate Invite Link
+                          const data = await callApi(`${API_URL}/split/groups/${selectedGroupId}/invite`, { method: "POST" });
+                          setInviteLink(data.link);
+                        } catch (err) { setError(err.message); }
+                      }}>
+                        <LinkIcon size={14} /> Generate Invite Link
                       </button>
                       {inviteLink && (
-                        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                          <input
-                            className="form-input"
-                            readOnly
-                            value={inviteLink}
-                            style={{ flex: 1, fontSize: "12px", cursor: "text" }}
-                            onFocus={(e) => e.target.select()}
-                          />
-                          <button
-                            type="button"
-                            className="btn btn-primary"
-                            style={{ whiteSpace: "nowrap", padding: "6px 12px" }}
-                            onClick={() => {
-                              navigator.clipboard.writeText(inviteLink);
-                              setCopied(true);
-                              setTimeout(() => setCopied(false), 2000);
-                            }}
-                          >
-                            {copied ? "✓ Copied!" : "Copy"}
+                        <div style={{ display: "flex", gap: "var(--space-sm)", alignItems: "center" }}>
+                          <input className="input" readOnly value={inviteLink} onFocus={(e) => e.target.select()} style={{ flex: 1, padding: "8px", fontSize: "12px" }} />
+                          <button type="button" className="btn btn-primary" style={{ padding: "8px 12px" }} onClick={() => { navigator.clipboard.writeText(inviteLink); setCopied(true); setTimeout(() => setCopied(false), 2000); }}>
+                            {copied ? "Copied!" : "Copy"}
                           </button>
                         </div>
                       )}
                     </div>
-                  </>
+                  </div>
                 ) : (
-                  <div style={{ opacity: 0.6, fontSize: "14px" }}>Select a group above to view and manage its members.</div>
+                  <div style={{ padding: "var(--space-xl) 0", textAlign: "center", color: "var(--color-text-tertiary)", fontSize: "var(--font-size-sm)" }}>
+                    Select a group above to view and manage its members.
+                  </div>
                 )}
               </div>
+            </div>
 
-
-              {/* ── Add Split Expense ─────────────────────────── */}
-              <div className="chart-card card-glass" style={{ padding: "18px" }}>
-                <h3 style={{ marginBottom: "10px", display: "flex", gap: "8px", alignItems: "center" }}>
-                  <ReceiptIndianRupee size={18} /> Add Split Expense
+            {/* 2. MIDDLE ROW: EXPENSES & BALANCES */}
+            <div className="charts-grid">
+              {/* Add Expense (Left side, takes 2fr because it is wide) */}
+              <div className="card-glass" style={{ display: "flex", flexDirection: "column" }}>
+                <h3 className="section-title" style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "var(--space-lg)" }}>
+                  <div className="stat-icon stat-icon-success" style={{ width: "32px", height: "32px", borderRadius: "var(--radius-sm)" }}>
+                    <ReceiptIndianRupee size={16} />
+                  </div>
+                  Add Split Expense
                 </h3>
 
-                <div style={{ marginBottom: "8px" }}>
-                  <label>Group</label>
-                  <select
-                    className="form-input"
-                    value={selectedGroupId}
-                    onChange={(e) => setSelectedGroupId(e.target.value)}
-                  >
-                    <option value="">Select group</option>
-                    {groups.map((g) => (
-                      <option key={g.id} value={g.id}>{g.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <form onSubmit={handleCreateExpense}>
-                  <input
-                    className="form-input"
-                    placeholder="Expense title"
-                    value={expenseTitle}
-                    onChange={(e) => setExpenseTitle(e.target.value)}
-                    style={{ marginBottom: "8px" }}
-                  />
-                  <input
-                    className="form-input"
-                    type="number"
-                    placeholder="Amount"
-                    value={expenseAmount}
-                    onChange={(e) => setExpenseAmount(e.target.value)}
-                    style={{ marginBottom: "8px" }}
-                  />
-                  <input
-                    className="form-input"
-                    type="date"
-                    value={expenseDate}
-                    onChange={(e) => setExpenseDate(e.target.value)}
-                    style={{ marginBottom: "8px" }}
-                  />
-                  <select
-                    className="form-input"
-                    value={splitType}
-                    onChange={(e) => setSplitType(e.target.value)}
-                    style={{ marginBottom: "8px" }}
-                  >
-                    <option value="equal">Equal</option>
-                    <option value="exact">Exact</option>
-                    <option value="percentage">Percentage</option>
-                  </select>
-
-                  <select
-                    className="form-input"
-                    value={paidBy}
-                    onChange={(e) => setPaidBy(e.target.value)}
-                    style={{ marginBottom: "8px" }}
-                  >
-                    <option value="">Paid by </option>
-                    {groupMembersForForm.map((member) => (
-                      <option key={member.id} value={member.id}>{member.name}</option>
-                    ))}
-                  </select>
-
-                  <div style={{ maxHeight: "140px", overflow: "auto", marginBottom: "8px" }}>
-                    {groupMembersForForm.map((member) => (
-                      <div key={member.id} style={{ marginBottom: "6px" }}>
-                        <label>
-                          <input
-                            type="checkbox"
-                            checked={participantIds.includes(member.id)}
-                            onChange={() => setParticipantIds((prev) => toggleId(prev, member.id))}
-                          />{" "}
-                          {member.name}
-                        </label>
-
-                        {participantIds.includes(member.id) && splitType === "exact" ? (
-                          <input
-                            className="form-input"
-                            style={{ marginTop: "6px" }}
-                            type="number"
-                            placeholder="Exact amount"
-                            value={exactMap[member.id] || ""}
-                            onChange={(e) =>
-                              setExactMap((prev) => ({ ...prev, [member.id]: e.target.value }))
-                            }
-                          />
-                        ) : null}
-
-                        {participantIds.includes(member.id) && splitType === "percentage" ? (
-                          <input
-                            className="form-input"
-                            style={{ marginTop: "6px" }}
-                            type="number"
-                            placeholder="Percentage"
-                            value={percentageMap[member.id] || ""}
-                            onChange={(e) =>
-                              setPercentageMap((prev) => ({ ...prev, [member.id]: e.target.value }))
-                            }
-                          />
-                        ) : null}
-                      </div>
-                    ))}
+                <form onSubmit={handleCreateExpense} style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)", flex: 1 }}>
+                  <div className="input-group">
+                    <label className="input-label">Group</label>
+                    <select className="input" value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)}>
+                      <option value="">Select group</option>
+                      {groups.map((g) => (
+                        <option key={g.id} value={g.id}>{g.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-md)" }}>
+                    <div className="input-group">
+                      <label className="input-label">Title</label>
+                      <input className="input" placeholder="E.g. Dinner" value={expenseTitle} onChange={(e) => setExpenseTitle(e.target.value)} />
+                    </div>
+                    <div className="input-group">
+                      <label className="input-label">Amount</label>
+                      <input className="input" type="number" placeholder="0.00" value={expenseAmount} onChange={(e) => setExpenseAmount(e.target.value)} />
+                    </div>
                   </div>
 
-                  <button type="submit" className="btn btn-primary">
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--space-md)", alignItems: "end" }}>
+                    <div className="input-group">
+                      <label className="input-label">Date</label>
+                      <input className="input" type="date" value={expenseDate} onChange={(e) => setExpenseDate(e.target.value)} />
+                    </div>
+                    <div className="input-group">
+                      <label className="input-label">Paid by</label>
+                      <select className="input" value={paidBy} onChange={(e) => setPaidBy(e.target.value)}>
+                        <option value="">Select</option>
+                        {groupMembersForForm.map((member) => (
+                          <option key={member.id} value={member.id}>{member.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="input-group">
+                      <label className="input-label">Split Type</label>
+                      <select className="input" value={splitType} onChange={(e) => setSplitType(e.target.value)}>
+                        <option value="equal">Equal</option>
+                        <option value="exact">Exact</option>
+                        <option value="percentage">Percentage</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="input-group" style={{ flex: 1 }}>
+                    <label className="input-label">Participants</label>
+                    <select
+                      className="input"
+                      onChange={(e) => {
+                        const id = Number(e.target.value);
+                        if (id && !participantIds.includes(id)) {
+                          setParticipantIds((prev) => [...prev, id]);
+                        }
+                        e.target.value = "";
+                      }}
+                    >
+                      <option value="">-- Select Member to Add --</option>
+                      {groupMembersForForm
+                        .filter((m) => !participantIds.includes(m.id))
+                        .map((member) => (
+                          <option key={member.id} value={member.id}>
+                            {member.name}
+                          </option>
+                        ))}
+                    </select>
+
+                    <div style={{ border: "1px solid var(--color-border)", borderRadius: "var(--radius-md)", padding: "var(--space-md)", background: "var(--color-bg-tertiary)", maxHeight: "200px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "var(--space-sm)", marginTop: "var(--space-xs)" }}>
+                      {participantIds.length === 0 ? (
+                        <div style={{ fontSize: "13px", color: "var(--color-text-tertiary)", textAlign: "center" }}>No participants selected.</div>
+                      ) : (
+                        participantIds.map((id) => {
+                          const member = groupMembersForForm.find((m) => m.id === id);
+                          if (!member) return null;
+                          return (
+                            <div key={member.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--space-sm)", background: "var(--color-bg-secondary)", padding: "8px", borderRadius: "var(--radius-sm)", border: "1px solid var(--color-border)" }}>
+                              <span style={{ fontSize: "var(--font-size-sm)", flex: 1, fontWeight: 500 }}>{member.name}</span>
+                              {splitType === "exact" && (
+                                <input className="input" style={{ width: "100px", padding: "6px 8px" }} type="number" placeholder="Amount" value={exactMap[member.id] || ""} onChange={(e) => setExactMap((prev) => ({ ...prev, [member.id]: e.target.value }))} />
+                              )}
+                              {splitType === "percentage" && (
+                                <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                                  <input className="input" style={{ width: "70px", padding: "6px 8px" }} type="number" placeholder="%" value={percentageMap[member.id] || ""} onChange={(e) => setPercentageMap((prev) => ({ ...prev, [member.id]: e.target.value }))} />
+                                  <span style={{ fontSize: "var(--font-size-sm)", color: "var(--color-text-secondary)" }}>%</span>
+                                </div>
+                              )}
+                              <button type="button" className="btn btn-icon" style={{ padding: "4px", color: "var(--color-danger)" }} onClick={() => setParticipantIds((prev) => prev.filter((p) => p !== id))}>
+                                <X size={14} />
+                              </button>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+
+                  <button type="submit" className="btn btn-primary" style={{ marginTop: "auto" }}>
                     <Plus size={16} /> Add Expense
                   </button>
                 </form>
               </div>
+
+              {/* Balances (Right side) */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-lg)" }}>
+                <div className="card-glass">
+                  <h3 className="section-title" style={{ marginBottom: "var(--space-md)", fontSize: "var(--font-size-base)" }}>Net Balances</h3>
+                  {balances.netBalances.length === 0 ? (
+                    <div style={{ color: "var(--color-text-tertiary)", fontSize: "var(--font-size-sm)", fontStyle: "italic" }}>No balances to show.</div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
+                      {balances.netBalances.map((row) => (
+                        <div key={row.user_id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "var(--space-sm) 0", borderBottom: "1px solid var(--color-border)" }}>
+                          <span style={{ fontSize: "var(--font-size-sm)", fontWeight: 500 }}>{row.name}</span>
+                          <span className={`badge ${row.balance >= 0 ? "badge-success" : "badge-danger"}`} style={{ fontSize: "14px", padding: "4px 8px" }}>
+                            {row.balance >= 0 ? "+" : ""}₹{Number(row.balance).toFixed(2)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="card-glass" style={{ flex: 1 }}>
+                  <h3 className="section-title" style={{ marginBottom: "var(--space-md)", fontSize: "var(--font-size-base)" }}>Who Owes Whom</h3>
+                  {balances.settlements.length === 0 ? (
+                    <div style={{ color: "var(--color-text-tertiary)", fontSize: "var(--font-size-sm)", fontStyle: "italic", textAlign: "center", padding: "var(--space-xl) 0" }}>
+                      <div style={{ marginBottom: "var(--space-sm)", fontSize: "24px" }}>🎉</div> All settled up!
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
+                      {balances.settlements.map((s, idx) => (
+                        <div key={idx} style={{ display: "flex", flexDirection: "column", gap: "var(--space-xs)", padding: "var(--space-md)", background: "var(--color-bg-tertiary)", borderRadius: "var(--radius-md)", border: "1px solid var(--color-border)" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--font-size-sm)" }}>
+                            <span><strong>{s.from_name}</strong> owes <strong>{s.to_name}</strong></span>
+                            <span style={{ fontWeight: 700, color: "var(--color-text-primary)" }}>₹{Number(s.amount).toFixed(2)}</span>
+                          </div>
+                          {Number(s.from_user_id) === Number(user.id) && (
+                            <button className="btn btn-secondary" style={{ padding: "4px 12px", marginTop: "var(--space-xs)" }} onClick={() => handleSettle(s)}>Settle Up</button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
+            {/* 3. BOTTOM ROW: EXPENSE HISTORY */}
+            <div className="card-glass">
+              <h3 className="section-title" style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "var(--space-lg)" }}>
+                <div className="stat-icon stat-icon-info" style={{ width: "32px", height: "32px", borderRadius: "var(--radius-sm)" }}>
+                  <History size={16} />
+                </div>
+                Expense History
+              </h3>
 
-            <div className="chart-card card-glass" style={{ padding: "18px", marginBottom: "20px" }}>
-              <h3 style={{ marginBottom: "10px" }}>Net Balances ({activeGroup?.name || "No group"})</h3>
-              {balances.netBalances.length === 0 ? (
-                <div>No balances yet.</div>
-              ) : (
-                balances.netBalances.map((row) => (
-                  <div key={row.user_id} style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
-                    <span>{row.name}</span>
-                    <strong style={{ color: row.balance >= 0 ? "#22c55e" : "#f43f5e" }}>
-                      {row.balance >= 0 ? "+" : ""}₹{Number(row.balance).toFixed(2)}
-                    </strong>
-                  </div>
-                ))
-              )}
-            </div>
-
-            <div className="chart-card card-glass" style={{ padding: "18px", marginBottom: "20px" }}>
-              <h3 style={{ marginBottom: "10px" }}>Who Owes Whom</h3>
-              {balances.settlements.length === 0 ? (
-                <div>All settled up.</div>
-              ) : (
-                balances.settlements.map((s, idx) => (
-                  <div key={idx} style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", gap: "10px" }}>
-                    <span>{s.from_name} pays {s.to_name}</span>
-                    <span>
-                      <strong>₹{Number(s.amount).toFixed(2)}</strong>{" "}
-                      {Number(s.from_user_id) === Number(user.id) ? (
-                        <button className="btn btn-secondary" onClick={() => handleSettle(s)}>Settle</button>
-                      ) : null}
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-
-            <div className="chart-card card-glass" style={{ padding: "18px" }}>
-              <h3 style={{ marginBottom: "10px" }}>Expense History</h3>
               {expenses.length === 0 ? (
-                <div>No split expenses found.</div>
+                <div style={{ color: "var(--color-text-tertiary)", textAlign: "center", padding: "var(--space-xl)" }}>No expenses recorded yet.</div>
               ) : (
-                expenses.map((exp) => (
-                  <div key={exp.id} style={{ padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-                      <strong>{exp.title}</strong>
-                      <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                        <strong>₹{Number(exp.amount).toFixed(2)}</strong>
-                        <button
-                          className="btn btn-icon"
-                          style={{ padding: "2px", color: "#f43f5e" }}
-                          onClick={() => handleDeleteExpense(exp.id)}
-                          title="Delete Expense"
-                        >
-                          <X size={14} />
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  {expenses.map((exp) => (
+                    <div key={exp.id} className="transaction-item" style={{ borderBottom: "1px solid var(--color-border)", borderRadius: 0, background: "transparent", padding: "var(--space-md) 0" }}>
+                      <div className="transaction-icon" style={{ background: "var(--color-info-bg)", color: "var(--color-info)" }}>
+                        <ReceiptIndianRupee size={20} />
+                      </div>
+                      <div className="transaction-details">
+                        <div className="transaction-title">{exp.title}</div>
+                        <div className="transaction-meta">
+                          <span className="transaction-category">Paid by {exp.paid_by_name}</span>
+                          <span className="transaction-date">{new Date(exp.expense_date).toLocaleDateString()}</span>
+                          <span className="badge badge-info" style={{ marginLeft: "var(--space-sm)", textTransform: "capitalize" }}>{exp.split_type} split</span>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-lg)" }}>
+                        <div className="transaction-amount">₹{Number(exp.amount).toFixed(2)}</div>
+                        <button className="btn btn-icon" style={{ color: "var(--color-danger)", background: "var(--color-danger-bg)" }} onClick={() => handleDeleteExpense(exp.id)} title="Delete Expense">
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </div>
-                    <div style={{ fontSize: "13px", opacity: 0.8 }}>
-                      Paid by {exp.paid_by_name} | {exp.split_type} split | {new Date(exp.expense_date).toLocaleDateString()}
-                    </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
             </div>
-          </>
+          </div>
         )}
       </main>
     </div>

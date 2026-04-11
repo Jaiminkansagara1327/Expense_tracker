@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import {
     Wallet,
     TrendingUp,
@@ -102,8 +102,17 @@ function Transactions({ user, onLogout }) {
             });
         }
         setModalError('');
+        setModalError('');
         setModalOpen(true);
     };
+
+    const location = useLocation();
+    useEffect(() => {
+        if (location.state && location.state.openModal) {
+            handleOpenModal();
+            navigate('/transactions', { replace: true, state: {} });
+        }
+    }, [location.state, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
